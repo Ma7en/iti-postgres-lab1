@@ -22,13 +22,25 @@ In this case:
     - Keep track of Students and Track which he belong to it, and subjects owned by Tack , and Subjects which will studied by each student 
 
 
-Student(#'student_id', name, email, address, phone_numbers)
+Student(#'student_id', name, email, address, *track_id)
+
+Phones(#'phone_id', phone_number, student_id)
+
 
 Track (#'track_id', track_name)
 
-Subject (#'subject_id', subject_name, description, max_score)
 
-Exam (#"exam_id", exam_date, *student_id, *subject_id, score)
+Subject (#'subject_id', subject_name, description, max_score, *track_id)
+
+Student_Subjects(#'student_id', #'subject_id')
+
+
+Exam (#"exam_id", exam_date, *student_id)
+
+Exam_Results (#'exam_result_id', *student_id, *exam_id, score)
+
+
+
 
 
 2.  Design ERD and write down the mapping schema. 
@@ -44,31 +56,127 @@ create database postgres_lab1;
 \c postgres_lab1
 
 
-create table student (student_id serial primary key, name text, email text, address text);
-create table p_numbers (phone_id serial primary key, student_id int references student(student_id), phone_numbers text);
+create table student (
+    student_id serial primary key, 
+    name text, 
+    email text, 
+    address text,
+    track_id int references track(track_id)
+);
 
-create table track (track_id serial primary key, track_name text);
+create table phone (
+    phone_id serial primary key, 
+    phone_number text,
+    student_id int references student(student_id)
+);
 
-create table subject (subject_id serial primary key, subject_name text, description text, max_score int);
 
-create table exam (exam_id serial primary key, exam_date date, student_id int references student(student_id), subject_id int references subject(subject_id), score int);
+create table track (
+    track_id serial primary key, 
+    track_name text
+);
 
+
+create table subject (
+    subject_id serial primary key, 
+    subject_name text, 
+    description text, 
+    max_score int,
+    track_id int references track(track_id)
+);
+
+create table student_subjects (
+    student_id int references student(student_id),
+    subject_id int references subject(subject_id) 
+);
+
+
+create table exam (
+    exam_id serial primary key, 
+    exam_date date, 
+    subject_id int references subject(subject_id)
+);
+
+create table exam_results (
+    exam_result_id serial primary key, 
+    student_id int references student(student_id), 
+    exam_id int references exam(exam_id), 
+    score int
+);
 
 
 
 
 4.  Insert at minimum 5 Rows at each table 
  
-insert into student (name, email, address) values ('mazen saad', 'mazen@gmail.com', 'fayoum'), ('ali ahmed', 'ali@gmail.com', 'fayoum'), ('mohammed emad', 'emad@gmail.com', 'Bani Sweif'), ('ahmed nabil', 'nabil@gmail.com', 'cairo'), ('maryam Sayed', 'maryam@gmail.com', 'cairo');
+insert into student 
+    (name, email, address, track_id) 
+values 
+    ('mazen saad', 'mazen@gmail.com', 'fayoum', 1), 
+    ('ali ahmed', 'ali@gmail.com', 'fayoum', 2), 
+    ('mohammed emad', 'emad@gmail.com', 'Bani Sweif', 3), 
+    ('ahmed nabil', 'nabil@gmail.com', 'cairo', 4), 
+    ('maryam Sayed', 'maryam@gmail.com', 'cairo', 5);
 
-insert into p_numbers (student_id, phone_numbers) values (1, '01012312311'), (2, '01012312322'), (3, '01012312333'), (4, '01012312344'), (5, '01012312355');
+insert into phone 
+    (phone_number, student_id) 
+values 
+    ('01012002001', 1), 
+    ('01012002322', 2), 
+    ('01012002333', 3), 
+    ('01012002344', 4), 
+    ('01012002355', 5);
 
-insert into track (track_name) values ('Python'), ('OpenSource'), ('Java'), ('Game'), ('.Net');
 
-insert into subject (subject_name, description, max_score) values ('C Programming', 'Introduction to C programming.', 100), ('C++ Programming', 'Advanced C++ concepts.', 100), ('Java', 'Introduction to Java programming.', 100), ('HTML', 'Basic HTML and web development.', 100), ('CSS', 'Basic CSS and web development.', 100);
 
-insert into exam (exam_date, student_id, subject_id, score) values ('2024-07-01', 1, 1, 85),('2024-07-02', 2, 2, 90),('2024-07-03', 3, 3, 75),('2024-07-04', 4, 4, 88),('2024-07-05', 5, 5, 92);
+insert into track 
+    (track_name) 
+values 
+    ('Python'), 
+    ('OpenSource'), 
+    ('Java'), 
+    ('Game'), 
+    ('.Net');
 
+
+
+insert into subject 
+    (subject_name, description, max_score, track_id) 
+values 
+    ('C Programming', 'Introduction to C programming.', 100, 1), 
+    ('C++ Programming', 'Advanced C++ concepts.', 100, 2), 
+    ('Java', 'Introduction to Java programming.', 100, 3), 
+    ('HTML', 'Basic HTML and web development.', 100, 4),
+    ('CSS', 'Basic CSS and web development.', 100, 5);
+
+insert into student_subjects 
+    (student_id, subject_id) 
+values 
+    (1, 1), 
+    (2, 2), 
+    (3, 3), 
+    (4, 4), 
+    (5, 5); 
+
+
+
+insert into exam 
+    (exam_date, subject_id) 
+values 
+    ('2024-07-01', 1), 
+    ('2024-07-02', 2), 
+    ('2024-07-03', 3), 
+    ('2024-07-04', 4), 
+    ('2024-07-05', 5);
+
+insert into exam_results 
+    (student_id, exam_id, score) 
+values 
+    (1, 1, 86), 
+    (2, 2, 77), 
+    (3, 3, 65), 
+    (4, 4, 50), 
+    (5, 5, 35);
 
 
 
@@ -76,10 +184,20 @@ insert into exam (exam_date, student_id, subject_id, score) values ('2024-07-01'
 \d 
 
 select * from student;
-select * from p_numbers;
+select * from phone;
+
 select * from track;
+
 select * from subject;
+select * from student_subjects;
+
 select * from exam;
+select * from exam_results;
+
+
+
+
+
 
 
 Reports :- 
