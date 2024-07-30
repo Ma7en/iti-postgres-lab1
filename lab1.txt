@@ -56,6 +56,13 @@ create database postgres_lab1;
 \c postgres_lab1
 
 
+create table track (
+    track_id serial primary key, 
+    track_name text
+);
+
+
+
 create table student (
     student_id serial primary key, 
     name text, 
@@ -71,11 +78,6 @@ create table phone (
 );
 
 
-create table track (
-    track_id serial primary key, 
-    track_name text
-);
-
 
 create table subject (
     subject_id serial primary key, 
@@ -89,6 +91,8 @@ create table student_subjects (
     student_id int references student(student_id),
     subject_id int references subject(subject_id) 
 );
+
+
 
 
 create table exam (
@@ -108,7 +112,18 @@ create table exam_results (
 
 
 4.  Insert at minimum 5 Rows at each table 
- 
+
+insert into track 
+    (track_name) 
+values 
+    ('Python'), 
+    ('OpenSource'), 
+    ('Java'), 
+    ('Game'), 
+    ('.Net');
+
+
+
 insert into student 
     (name, email, address, track_id) 
 values 
@@ -129,16 +144,6 @@ values
 
 
 
-insert into track 
-    (track_name) 
-values 
-    ('Python'), 
-    ('OpenSource'), 
-    ('Java'), 
-    ('Game'), 
-    ('.Net');
-
-
 
 insert into subject 
     (subject_name, description, max_score, track_id) 
@@ -157,6 +162,7 @@ values
     (3, 3), 
     (4, 4), 
     (5, 5); 
+
 
 
 
